@@ -24,6 +24,20 @@ if ! getent passwd "$PUID" >/dev/null 2>&1; then
     useradd -u "$PUID" -g "$PGID" -M -s /bin/sh -d /app odysseus
 fi
 
+# Railway single-volume compatibility:
+# keep Cookbook SSH keys, HF cache and user-installed engines under /app/data.
+mkdir -p /app/data/ssh /app/data/huggingface /app/data/local /app/data/fastembed
+mkdir -p /app/.cache
+
+rm -rf /app/.ssh
+rm -rf /app/.cache/huggingface
+rm -rf /app/.local
+
+ln -sfn /app/data/ssh /app/.ssh
+ln -sfn /app/data/huggingface /app/.cache/huggingface
+ln -sfn /app/data/local /app/.local
+
+
 # Repair ownership on every writable path the app touches at runtime.
 #
 # Bind-mounted dirs (/app/data, /app/logs) are the obvious ones, but
